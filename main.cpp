@@ -1,19 +1,14 @@
 #include "SDL_utils.h"
+#include "map.h"
 
 using namespace std;
-
-SDL_Window* window = nullptr;
-SDL_Renderer* renderer = nullptr;
-SDL_Event event;
-
-
 
 int main(int argc, char* argv[]) {
     bool running = true;
     if (!Init())
         return 1;
 
-    SDL_Texture* background = loadImg("Assets/background.jpg",renderer);
+    SDL_Texture* background = loadImg("Assets/Capture.PNG",renderer);
 
     while (running) {
         while (SDL_PollEvent(&event)) {
@@ -30,5 +25,4 @@ int main(int argc, char* argv[]) {
     quit();
     return 0;
 }
-
 

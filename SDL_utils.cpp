@@ -2,23 +2,20 @@
 #define DSL_UTILS_H
 
 #include <SDL.h>
+#include "stdafx.h"
 #include <SDL_image.h>
 #include <iostream>
 #include <string>
 
 using namespace std;
 
-SDL_Window* window;
-SDL_Renderer* renderer;
-SDL_Event event;
+extern SDL_Window* window;
+extern SDL_Renderer* renderer;
+extern SDL_Event event;
 
 const int SCREEN_WIDTH = 1200;
 const int SCREEN_HEIGHT = 640;
 const char* const TITLE = "Game";
-
-const int Colour_R = 167;
-const int Colour_G = 175;
-const int Colour_B = 180;
 
 bool Init();
 void quit();
@@ -79,4 +76,3 @@ void quit() {
 }
 
 #endif // DSL_UTILS_H
-
