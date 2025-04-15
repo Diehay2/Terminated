@@ -17,10 +17,6 @@ const int SCREEN_WIDTH = 1200;
 const int SCREEN_HEIGHT = 640;
 const char* const TITLE = "Game";
 
-const int Colour_R = 167;
-const int Colour_G = 175;
-const int Colour_B = 180;
-
 bool Init();
 void quit();
 SDL_Texture* loadImg(const string& file_path, SDL_Renderer* renderer);
