@@ -1,5 +1,6 @@
 #include "SDL_utils.h"
 #include "map.h"
+#include "player.h"
 
 using namespace std;
 
@@ -14,16 +15,22 @@ int main(int argc, char* argv[]) {
     tileMap.loadMap("map.txt");
     tileMap.loadTiles(renderer);
 
+    Player p_player;
+    p_player.load_player("Assets/animations/standing_right.jpg", renderer);
+    p_player.setclip();
+
     while (running) {
         while (SDL_PollEvent(&event)) {
             if (event.type == SDL_QUIT) {
                 running = false;
             }
+            p_player.handleInput(event,renderer);
         }
 
         SDL_RenderClear(renderer);
         SDL_RenderCopy(renderer, background, NULL, NULL);
         tileMap.DrawMap(renderer);
+        p_player.ShowObject(renderer);
 
         SDL_RenderPresent(renderer);
         SDL_Delay(16);
