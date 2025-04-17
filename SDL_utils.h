@@ -6,6 +6,7 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <cmath>
 
 using namespace std;
 
@@ -13,7 +14,7 @@ SDL_Window* window;
 SDL_Renderer* renderer;
 SDL_Event event;
 
-const int SCREEN_WIDTH = 1200;
+const int SCREEN_WIDTH = 1280;
 const int SCREEN_HEIGHT = 640;
 const char* const TITLE = "Game";
 

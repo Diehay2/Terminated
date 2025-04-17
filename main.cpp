@@ -16,7 +16,7 @@ int main(int argc, char* argv[]) {
     tileMap.loadTiles(renderer);
 
     Player p_player;
-    p_player.load_player("Assets/animations/standing_right.jpg", renderer);
+    p_player.load_player(renderer);
     p_player.setclip();
 
     while (running) {
@@ -26,6 +26,8 @@ int main(int argc, char* argv[]) {
             }
             p_player.handleInput(event,renderer);
         }
+
+        p_player.DoPlayer(tileMap.getMap());
 
         SDL_RenderClear(renderer);
         SDL_RenderCopy(renderer, background, NULL, NULL);
