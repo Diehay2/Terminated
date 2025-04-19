@@ -2,14 +2,13 @@
 #define MAP_H
 
 #include "SDL_utils.h"
-#include <fstream>
 
 using namespace std;
 
 #define MAX_MAP_X 40
 #define MAX_MAP_Y 20
 #define TILE_SIZE 32
-#define MAX_TILES 7
+#define MAX_TILES 8
 
 struct Map {
     int start_x;

@@ -17,7 +17,10 @@ int main(int argc, char* argv[]) {
 
     Player p_player;
     p_player.load_player(renderer);
-    p_player.setclip();
+    p_player.setclip_standing();
+    p_player.setclip_walking();
+    p_player.setclip_jumping();
+    p_player.setclip_pistol();
 
     while (running) {
         while (SDL_PollEvent(&event)) {
