@@ -179,7 +179,7 @@ public:
         height_frame = stand_height_frame;
     }
 
-    SDL_Rect renderQuad = {static_cast<int>(x_pos), static_cast<int>(y_pos), width_frame, height_frame};
+    SDL_Rect renderQuad = {static_cast<int>(x_pos), static_cast<int>(y_pos + 1), width_frame, height_frame};
     SDL_RenderCopy(des, current_texture, current_clip, &renderQuad);
     }
 
@@ -234,6 +234,13 @@ public:
 
     void DoPlayer (Map& map_data) {
         if (status == PISTOL_LEFT || status == PISTOL_RIGHT) {
+            y_val += GRAVITY_SPEED;
+            if (y_val >= MAX_FALL_SPEED) {
+                y_val = MAX_FALL_SPEED;
+            }
+
+            x_val = 0;
+
             check_to_map(map_data);
             return;
         }
@@ -274,7 +281,7 @@ void check_to_map(Map &map_data) {
 
     x1 = (x_pos + x_val) / TILE_SIZE;
     x2 = (x_pos + x_val + width_frame - 1) / TILE_SIZE;
-    y1 = (y_pos) / TILE_SIZE;
+    y1 = (y_pos + 1) / TILE_SIZE;
     y2 = (y_pos + height_frame - 1) / TILE_SIZE;
 
     if (x_val > 0) {
@@ -290,8 +297,10 @@ void check_to_map(Map &map_data) {
         }
     }
 
+    x_pos += x_val;
+
     int height_min = min(height_frame,TILE_SIZE);
-    x1 = (x_pos) / TILE_SIZE;
+    x1 = (x_pos + 1) / TILE_SIZE;
     x2 = (x_pos + width_frame - 1) / TILE_SIZE;
     y1 = (y_pos + y_val) / TILE_SIZE;
     y2 = (y_pos + y_val + height_min - 1) / TILE_SIZE;
@@ -310,7 +319,6 @@ void check_to_map(Map &map_data) {
         }
     }
 
-    x_pos += x_val;
     y_pos += y_val;
 
     if (x_pos < 0) {

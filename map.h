@@ -8,7 +8,7 @@ using namespace std;
 #define MAX_MAP_X 40
 #define MAX_MAP_Y 20
 #define TILE_SIZE 32
-#define MAX_TILES 8
+#define MAX_TILES 5
 
 struct Map {
     int start_x;
