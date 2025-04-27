@@ -3,6 +3,7 @@
 
 #include "SDL_utils.h"
 #include "map.h"
+//#include "bullet.h"
 
 using namespace std;
 
@@ -143,17 +144,18 @@ public:
     }
 
     else if (status == JUMP_LEFT || status == JUMP_RIGHT) {
-            animation_delay_counter++;
+    animation_delay_counter++;
     if (animation_delay_counter >= animation_delay_max) {
         frame++;
         if (frame >= 2) frame = 0;
         animation_delay_counter = 0;
     }
-    current_clip = &frame_clip_jump[frame % 2];
+    current_clip = &frame_clip_jump[frame];
     current_texture = (status == JUMP_LEFT) ? texture_jump_left : texture_jump_right;
     width_frame = jump_width_frame;
     height_frame = jump_height_frame;
     }
+
 
     else if (status == PISTOL_LEFT || status == PISTOL_RIGHT) {
     frame = 0;
@@ -191,29 +193,31 @@ public:
                 status = WALK_RIGHT;
                 input_type.right = 1;
                 input_type.left = 0;
-
+                direction = true;
                 break;
 
             case SDLK_LEFT:
                 status = WALK_LEFT;
                 input_type.left = 1;
                 input_type.right = 0;
+                direction = false;
                 break;
 
             case SDLK_UP:
                 if (on_ground) {
                     input_type.jump = 1;
+                    status = (input_type.left == 1) ? JUMP_LEFT : JUMP_RIGHT;
                 }
                 break;
             case SDLK_c:
                 if (on_ground && !is_shooting) {
                 is_shooting = true;
-                status = (status == WALK_LEFT || status == STANDING_LEFT || status == PISTOL_LEFT)
-                ? PISTOL_LEFT : PISTOL_RIGHT;
+                status = direction ? PISTOL_RIGHT : PISTOL_LEFT;
                 frame = 0;
                 input_type.left = 0;
                 input_type.right = 0;
-
+                /*Bullet* bullet = new Bullet();
+                bullet->loadBullet("Assets/animations/bullet.png",screen);*/
                 }
                 break;
             }
@@ -227,6 +231,10 @@ public:
             case SDLK_LEFT:
                 input_type.left = 0;
                 if (!is_shooting) status = STANDING_LEFT;
+                break;
+            case SDLK_c:
+                is_shooting = false;
+                status = direction ? STANDING_RIGHT : STANDING_LEFT;
                 break;
         }
     }
@@ -261,14 +269,22 @@ public:
         if (input_type.jump == 1 && on_ground) {
             y_val = JUMP_HEIGHT;
             on_ground = false;
-            status = (status == WALK_LEFT || status == STANDING_LEFT) ? JUMP_LEFT : JUMP_RIGHT;
+            if (input_type.left == 1) {
+                status = JUMP_LEFT;
+            }
+            else if (input_type.right == 1) {
+                status = JUMP_RIGHT;
+            }
+            else {
+                status = direction ? JUMP_RIGHT : JUMP_LEFT;
+            }
         }
 
         input_type.jump = 0;
         check_to_map(map_data);
 
         if (on_ground && (status == JUMP_LEFT || status == JUMP_RIGHT)) {
-            status = (input_type.left) ? STANDING_LEFT : STANDING_RIGHT;
+            status = (direction) ? STANDING_RIGHT : STANDING_LEFT;
             frame = 0;
         }
     }
@@ -298,6 +314,7 @@ void check_to_map(Map &map_data) {
     }
 
     x_pos += x_val;
+    y_pos += y_val;
 
     int height_min = min(height_frame,TILE_SIZE);
     x1 = (x_pos + 1) / TILE_SIZE;
@@ -319,8 +336,6 @@ void check_to_map(Map &map_data) {
         }
     }
 
-    y_pos += y_val;
-
     if (x_pos < 0) {
         x_pos = 0;
     }
@@ -329,7 +344,7 @@ void check_to_map(Map &map_data) {
     }
 }
 
-private:
+protected:
     float x_val = 0;
     float y_val = 0;
 
@@ -380,6 +395,7 @@ private:
 
     bool on_ground = false;
     bool is_shooting = false;
+    bool direction = false;
 };
 
 #endif // PLAYER_H

@@ -9,7 +9,7 @@ int main(int argc, char* argv[]) {
     if (!Init())
         return 1;
 
-    SDL_Texture* background = loadImg("Assets/Capture.PNG",renderer);
+    SDL_Texture* background = loadImg("Assets/background1.PNG",renderer);
 
     TileMap tileMap;
     tileMap.loadMap("map.txt");

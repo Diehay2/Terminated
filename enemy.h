@@ -5,7 +5,7 @@
 #include "map.h"
 #include "player.h"
 
-class Enemy {
+class Enemy : public Player {
 public::
 
 };
