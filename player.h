@@ -3,7 +3,7 @@
 
 #include "SDL_utils.h"
 #include "map.h"
-//#include "bullet.h"
+#include "bullet.h"
 
 using namespace std;
 
@@ -216,8 +216,15 @@ public:
                 frame = 0;
                 input_type.left = 0;
                 input_type.right = 0;
-                /*Bullet* bullet = new Bullet();
-                bullet->loadBullet("Assets/animations/bullet.png",screen);*/
+                Bullet* bullet = new Bullet();
+                if (direction) {
+                    bullet->loadBullet("Assets/animations/bullet_left.png", renderer);
+                }
+                else {
+                    bullet->loadBullet("Assets/animations/bullet_right.png",renderer);
+                }
+                bullet->setPos(x_pos, y_pos);
+                bullet_list.push_back(bullet);
                 }
                 break;
             }
@@ -396,6 +403,8 @@ protected:
     bool on_ground = false;
     bool is_shooting = false;
     bool direction = false;
+
+    vector<Bullet*> bullet_list;
 };
 
 #endif // PLAYER_H

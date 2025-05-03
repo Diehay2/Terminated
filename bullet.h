@@ -19,31 +19,38 @@ public:
         texture = loadImg(filename, renderer);
         if (texture == nullptr) {
             logError_Exit("Load bullet", SDL_GetError());
+            return false;
         }
         SDL_QueryTexture(texture, nullptr, nullptr, &rect.w, &rect.h);
+
+        bullet_width_frame = rect.w / 3;
+        bullet_height_frame = rect.h;
+
+        for (int i = 0; i < 3; i++) {
+            frame_clip_bullet[i].x = i * bullet_width_frame;
+            frame_clip_bullet[i].y = 0;
+            frame_clip_bullet[i].w = bullet_width_frame;
+            frame_clip_bullet[i].h = bullet_height_frame;
+        }
         return true;
     }
 
-    void setPos(int x, int y) {
+    void setPos(float x, float y) {
         rect.x = x;
         rect.y = y;
     }
 
-    void setHor(int x_vel) {
+    void setHor(float x_vel) {
         x_val = x_vel;
         is_moving = true;
     }
 
-    /*void DrawBullet(SDL_Renderer* texture) {
-        SDL_RenderCopy(renderer, texture, nullptr, nullptr));
-    }*/
+    void DrawBullet(SDL_Renderer* renderer) {
+        if (texture != nullptr) SDL_RenderCopy(renderer, texture, nullptr, nullptr);
+    }
 
     bool OutRange() {
         return rect.x < 0 || rect.x > SCREEN_WIDTH;
-    }
-
-    void setclip_bullet() {
-
     }
 
 private:
@@ -59,7 +66,6 @@ private:
     int bullet_width_frame = 0;
     int bullet_height_frame = 0;
 
-    vector<Bullet*> bullet_list;
 };
 
 #endif // BULLET_H
