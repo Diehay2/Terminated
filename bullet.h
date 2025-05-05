@@ -5,13 +5,14 @@
 
 class Bullet {
 public:
-    Bullet() {;}
-    ~Bullet() {;}
+    Bullet() : texture(nullptr) {}
+    ~Bullet() {}
 
     void fire() {
         if (is_moving) {
-            rect.x += x_val;
-            rect.y += y_val;
+            rect.x += static_cast<int>(x_val);
+            rect.y += static_cast<int>(y_val);
+            distance += static_cast<int>(abs(x_val));
         }
     }
 
@@ -26,18 +27,21 @@ public:
         bullet_width_frame = rect.w / 3;
         bullet_height_frame = rect.h;
 
-        for (int i = 0; i < 3; i++) {
-            frame_clip_bullet[i].x = i * bullet_width_frame;
-            frame_clip_bullet[i].y = 0;
-            frame_clip_bullet[i].w = bullet_width_frame;
-            frame_clip_bullet[i].h = bullet_height_frame;
+        if (bullet_height_frame > 0 && bullet_width_frame > 0) {
+            for (int i = 0; i < 3; i++) {
+                frame_clip_bullet[i].x = i * bullet_width_frame;
+                frame_clip_bullet[i].y = 0;
+                frame_clip_bullet[i].w = bullet_width_frame;
+                frame_clip_bullet[i].h = bullet_height_frame;
+            }
         }
         return true;
     }
 
-    void setPos(float x, float y) {
+    void setPos(int x, int y) {
         rect.x = x;
         rect.y = y;
+        current_frame = 0;
     }
 
     void setHor(float x_vel) {
@@ -45,27 +49,47 @@ public:
         is_moving = true;
     }
 
-    void DrawBullet(SDL_Renderer* renderer) {
-        if (texture != nullptr) SDL_RenderCopy(renderer, texture, nullptr, nullptr);
+    void render(SDL_Renderer* renderer) {
+        if (texture != nullptr) {
+            SDL_RenderCopy(renderer, texture, &frame_clip_bullet[current_frame], &rect);
+        }
     }
 
     bool OutRange() {
-        return rect.x < 0 || rect.x > SCREEN_WIDTH;
+        return rect.x < 0 || rect.x > SCREEN_WIDTH || distance >= max_range;
+    }
+
+    void updateFrame() {
+        frame_delay ++;
+        if (frame_delay >= frame_delay_max) {
+        current_frame = (current_frame + 1) % 3;
+        frame_delay = 0;
+        }
+    }
+
+    SDL_Rect getRect() const {
+        return rect;
     }
 
 private:
-    int x_val = 0;
-    int y_val = 0;
+    float x_val = 0;
+    float y_val = 0;
     bool is_moving = false;
 
     SDL_Rect rect;
     SDL_Texture* texture;
 
     SDL_Rect frame_clip_bullet[3];
+    int current_frame = 0;
+    int frame_delay = 0;
+    const int frame_delay_max = 15;
 
     int bullet_width_frame = 0;
     int bullet_height_frame = 0;
 
+    int max_range = 500;
+    int distance = 0;
 };
 
 #endif // BULLET_H
+

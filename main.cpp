@@ -2,6 +2,10 @@
 #include "map.h"
 #include "player.h"
 
+SDL_Window* window = nullptr;
+SDL_Renderer* renderer = nullptr;
+SDL_Event event;
+
 using namespace std;
 
 int main(int argc, char* argv[]) {
@@ -35,7 +39,7 @@ int main(int argc, char* argv[]) {
         SDL_RenderClear(renderer);
         SDL_RenderCopy(renderer, background, NULL, NULL);
         tileMap.DrawMap(renderer);
-        p_player.ShowObject(renderer);
+        p_player.ShowObject(renderer, tileMap.getMap());
 
         SDL_RenderPresent(renderer);
         SDL_Delay(16);

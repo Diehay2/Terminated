@@ -120,7 +120,7 @@ public:
         }
     }
 
-    void ShowObject(SDL_Renderer* des) {
+    void ShowObject(SDL_Renderer* des, Map& map_data) {
     SDL_Rect* current_clip;
     SDL_Texture* current_texture;
     if (status == WALK_LEFT || status == WALK_RIGHT) {
@@ -183,6 +183,20 @@ public:
 
     SDL_Rect renderQuad = {static_cast<int>(x_pos), static_cast<int>(y_pos + 1), width_frame, height_frame};
     SDL_RenderCopy(des, current_texture, current_clip, &renderQuad);
+
+    for (int i = 0; i < bullet_list.size(); ++i) {
+        Bullet* bullet = bullet_list[i];
+        if (bullet != nullptr) {
+            bullet->fire();
+            bullet->updateFrame();
+            bullet->render(des);
+            if (bullet->OutRange() || check_to_bullet(bullet, map_data)) {
+            delete bullet;
+            bullet_list.erase(bullet_list.begin() + i);
+            i--;
+                }
+            }
+        }
     }
 
 
@@ -218,12 +232,14 @@ public:
                 input_type.right = 0;
                 Bullet* bullet = new Bullet();
                 if (direction) {
-                    bullet->loadBullet("Assets/animations/bullet_left.png", renderer);
+                    bullet->loadBullet("Assets/animations/bullet_right.png", screen);
+                    bullet->setHor(10);
                 }
                 else {
-                    bullet->loadBullet("Assets/animations/bullet_right.png",renderer);
+                    bullet->loadBullet("Assets/animations/bullet_left.png",screen);
+                    bullet->setHor(-10);
                 }
-                bullet->setPos(x_pos, y_pos);
+                bullet->setPos(x_pos + width_frame / 2, y_pos + 2);
                 bullet_list.push_back(bullet);
                 }
                 break;
@@ -296,7 +312,7 @@ public:
         }
     }
 
-void check_to_map(Map &map_data) {
+    void check_to_map(Map& map_data) {
     int x1 = 0;
     int x2 = 0;
     int y1 = 0;
@@ -349,6 +365,25 @@ void check_to_map(Map &map_data) {
     else if (x_pos + width_frame > map_data.max_x) {
         x_pos = map_data.max_x - width_frame - 1;
     }
+}
+
+bool check_to_bullet(Bullet* bullet, Map& map_data) {
+    SDL_Rect rect = bullet->getRect();
+
+    int left_tile = rect.x / TILE_SIZE;
+    int right_tile = (rect.x + rect.w - 1) / TILE_SIZE;
+    int top_tile = rect.y / TILE_SIZE;
+    int bottom_tile = (rect.y + rect.h - 1) / TILE_SIZE;
+
+    if (left_tile < 0 || right_tile >= MAX_MAP_X || top_tile < 0 || bottom_tile >= MAX_MAP_Y) return false;
+
+    for (int y = top_tile; y <= bottom_tile; ++y) {
+        for (int x = left_tile; x <= right_tile; ++x) {
+            if (map_data.tile[y][x] != 0) return true;
+        }
+    }
+
+    return false;
 }
 
 protected:

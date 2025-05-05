@@ -7,13 +7,14 @@
 #include <string>
 #include <vector>
 #include <cmath>
+#include <algorithm>
 #include <fstream>
 
 using namespace std;
 
-SDL_Window* window;
-SDL_Renderer* renderer;
-SDL_Event event;
+extern SDL_Window* window;
+extern SDL_Renderer* renderer;
+extern SDL_Event event;
 
 const int SCREEN_WIDTH = 1280;
 const int SCREEN_HEIGHT = 640;
