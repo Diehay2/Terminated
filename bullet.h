@@ -87,7 +87,7 @@ private:
     int bullet_width_frame = 0;
     int bullet_height_frame = 0;
 
-    int max_range = 500;
+    int max_range = 300;
     int distance = 0;
 };
 

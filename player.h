@@ -18,7 +18,7 @@ struct Movement {
     int jump = 0;
 };
 
-enum Walk {
+enum Actions {
     STANDING_RIGHT = 0,
     STANDING_LEFT = 1,
     WALK_RIGHT = 2,
@@ -32,6 +32,8 @@ enum Walk {
 class Player {
 public:
     Player(){
+        x_pos = 50;
+        y_pos = 600;
         rect.x = 0;
         rect.y = 0;
         rect.w = 0;
@@ -230,17 +232,22 @@ public:
                 frame = 0;
                 input_type.left = 0;
                 input_type.right = 0;
-                Bullet* bullet = new Bullet();
+                Uint32 now = SDL_GetTicks();
+                if (is_shooting && now - shot >= cooldown) {
+                    Bullet* bullet = new Bullet();
+                    shot = now;
                 if (direction) {
                     bullet->loadBullet("Assets/animations/bullet_right.png", screen);
                     bullet->setHor(10);
+                    bullet->setPos(x_pos + 5, y_pos + 2);
                 }
                 else {
                     bullet->loadBullet("Assets/animations/bullet_left.png",screen);
                     bullet->setHor(-10);
+                    bullet->setPos(x_pos - 45, y_pos + 2);
                 }
-                bullet->setPos(x_pos + width_frame / 2, y_pos + 2);
                 bullet_list.push_back(bullet);
+                }
                 }
                 break;
             }
@@ -367,7 +374,7 @@ public:
     }
 }
 
-bool check_to_bullet(Bullet* bullet, Map& map_data) {
+    bool check_to_bullet(Bullet* bullet, Map& map_data) {
     SDL_Rect rect = bullet->getRect();
 
     int left_tile = rect.x / TILE_SIZE;
@@ -386,7 +393,7 @@ bool check_to_bullet(Bullet* bullet, Map& map_data) {
     return false;
 }
 
-protected:
+private:
     float x_val = 0;
     float y_val = 0;
 
@@ -438,6 +445,9 @@ protected:
     bool on_ground = false;
     bool is_shooting = false;
     bool direction = false;
+
+    Uint32 shot = 0;
+    Uint32 cooldown = 500;
 
     vector<Bullet*> bullet_list;
 };
