@@ -27,16 +27,33 @@ int main(int argc, char* argv[]) {
     p_player.setclip_jumping();
     p_player.setclip_pistol();
 
-    const int EnemyNum = 25;
-    vector<Enemy> enemy_list;
+const int EnemyNum = 30;
+vector<Enemy> enemy_list;
 
-    for (int i = 0; i < EnemyNum; ++i) {
-        Enemy enemy;
-        enemy.setPos(150 + i * 150, i * 20);
-        enemy.load_enemy(renderer);
-        enemy.setclip_standing();
-        enemy_list.push_back(enemy);
+for (int i = 0; i < EnemyNum; ++i) {
+    Enemy enemy;
+    if (i < 5) {
+        enemy.setPos(0 + i * 250, 0 + i * 2);
     }
+    else if (i < 15) {
+        enemy.setPos(200 + (i - 10) * 300, 280 + i * 3);
+    }
+    else if (i < 20) {
+        enemy.setPos(200 + (i - 15) * 121, 224 + i * 2);
+    }
+    else if (i < 25) {
+        enemy.setPos(0 + (i - 20) * 100 * 4.5, 540 - i * 7.6);
+    }
+    else {
+        enemy.setPos(500 + (i - 25) * 400, 224);
+    }
+    enemy.load_enemy(renderer);
+    enemy.setclip_standing();
+    enemy.setclip_pistol();
+    enemy_list.push_back(enemy);
+}
+
+
 
     while (running) {
         while (SDL_PollEvent(&event)) {
@@ -49,7 +66,7 @@ int main(int argc, char* argv[]) {
         p_player.DoPlayer(tileMap.getMap());
 
         for (Enemy& enemy : enemy_list) {
-            enemy.DoEnemy(tileMap.getMap());
+            enemy.DoEnemy(renderer, tileMap.getMap());
         }
 
         SDL_RenderClear(renderer);

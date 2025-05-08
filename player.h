@@ -201,7 +201,6 @@ public:
         }
     }
 
-
     void handleInput(SDL_Event input, SDL_Renderer* screen) {
         if (input.type == SDL_KEYDOWN) {
             switch (input.key.keysym.sym) {
@@ -393,6 +392,15 @@ public:
     return false;
 }
 
+    float get_x_pos() {
+        return x_pos;
+    }
+    float get_y_pos() {
+        return y_pos;
+    }
+    int get_height_frame() const { return height_frame; }
+
+
 private:
     float x_val = 0;
     float y_val = 0;
@@ -444,7 +452,7 @@ private:
 
     bool on_ground = false;
     bool is_shooting = false;
-    bool direction = false;
+    bool direction = false; // true = right / false = left
 
     Uint32 shot = 0;
     Uint32 cooldown = 500;

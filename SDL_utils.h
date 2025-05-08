@@ -9,6 +9,8 @@
 #include <cmath>
 #include <algorithm>
 #include <fstream>
+#include <cstdlib>
+#include <ctime>
 
 using namespace std;
 

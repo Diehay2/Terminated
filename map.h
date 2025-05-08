@@ -64,7 +64,7 @@ file.close();
 
 void loadTiles(SDL_Renderer* screen) {
     for (int i = 0; i < MAX_TILES; i++) {
-        if (i>0) {
+        if (i > 0) {
         string filename = "Assets/tileset/main_tileset" + to_string(i-1) + ".png";
 
         tile_mat[i] = loadImg(filename, screen);

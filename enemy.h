@@ -14,6 +14,7 @@ public:
         rect.h = 0;
     }
     ~Enemy() {;}
+    Player* p_player;
 
     void setPos(float x, float y) {
         x_pos = x;
@@ -69,7 +70,6 @@ public:
 
     if (status == PISTOL_LEFT || status == PISTOL_RIGHT) {
     frame = 0;
-    is_shooting = false;
     current_clip = &frame_clip_pistol[frame];
     current_texture = (status == PISTOL_LEFT || status == STANDING_LEFT)
                     ? texture_pistol_left : texture_pistol_right;
@@ -182,9 +182,50 @@ public:
         x_pos = map_data.max_x - width_frame - 1;
     }
 }
+    bool inDistance (Player& p_player, SDL_Renderer* screen) {
+        float player_x_pos = p_player.get_x_pos();
+        float player_y_pos = p_player.get_y_pos();
 
-    void DoEnemy (Map& map_data) {
-        if (status == PISTOL_LEFT || status == PISTOL_RIGHT) {
+        float check_distance = x_pos - player_x_pos;
+        direction = (check_distance < 0);
+
+        float enemy_center_y = y_pos + height_frame / 2.0f;
+float player_center_y = player_y_pos + p_player.get_height_frame() / 2.0f;
+
+if (fabs(enemy_center_y - player_center_y) <= 40 && fabs(check_distance) <= distance)
+ {
+            status = direction ? PISTOL_RIGHT : PISTOL_LEFT;
+            return true;
+                }
+                return false;
+        }
+
+    void DoEnemy (SDL_Renderer* screen, Map& map_data) {
+            bool near = inDistance(*p_player, screen);
+            if (near) {
+                    Uint32 now = SDL_GetTicks();
+                if (!is_shooting && now - shot >= cooldown) {
+                    Bullet* bullet = new Bullet();
+                    shot = now;
+                    is_shooting = false;
+                if (direction) {
+                    bullet->loadBullet("Assets/animations/bullet_right.png", screen);
+                    bullet->setHor(10);
+                    bullet->setPos(x_pos + 5, y_pos + 2);
+                }
+                else {
+                    bullet->loadBullet("Assets/animations/bullet_left.png",screen);
+                    bullet->setHor(-10);
+                    bullet->setPos(x_pos - 45, y_pos + 2);
+                }
+                bullet_list.push_back(bullet);
+                }
+            }
+            else {
+        // Không gần thì set về trạng thái đứng nếu chưa đúng
+        if (direction) status = STANDING_RIGHT;
+        else status = STANDING_LEFT;
+    }
             y_val += GRAVITY_SPEED;
             if (y_val >= MAX_FALL_SPEED) {
                 y_val = MAX_FALL_SPEED;
@@ -196,11 +237,6 @@ public:
             return;
         }
 
-        x_val = 0;
-        y_val += GRAVITY_SPEED;
-
-        check_to_map(map_data);
-    }
 
 private:
     float x_val = 0;
@@ -253,10 +289,12 @@ private:
 
     bool on_ground = false;
     bool is_shooting = false;
-    bool direction = false;
+    bool direction = false; // true = right / false = left
 
     Uint32 shot = 0;
     Uint32 cooldown = 500;
+
+    float distance = 100;
 
     vector<Bullet*> bullet_list;
 };
