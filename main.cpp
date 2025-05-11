@@ -32,6 +32,7 @@ vector<Enemy> enemy_list;
 
 for (int i = 0; i < EnemyNum; ++i) {
     Enemy enemy;
+    enemy.p_player = &p_player;
     if (i < 5) {
         enemy.setPos(0 + i * 250, 0 + i * 2);
     }

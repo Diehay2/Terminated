@@ -192,10 +192,21 @@ public:
             bullet->fire();
             bullet->updateFrame();
             bullet->render(des);
+            cout << "Bullet size: " << rect.w << "x" << rect.h << std::endl;
+
+            bool _delete = false;
+
             if (bullet->OutRange() || check_to_bullet(bullet, map_data)) {
-            delete bullet;
-            bullet_list.erase(bullet_list.begin() + i);
-            i--;
+                _delete = true;
+                }
+            else if (bullet->getTag() == ENEMY && check_interaction(this->getRect(), bullet->getRect())) {
+                _delete = true;
+                }
+
+            if (_delete) {
+                delete bullet;
+                bullet_list.erase(bullet_list.begin() + i);
+                i--;
                 }
             }
         }
@@ -235,6 +246,7 @@ public:
                 if (is_shooting && now - shot >= cooldown) {
                     Bullet* bullet = new Bullet();
                     shot = now;
+                    bullet->setTag(PLAYER);
                 if (direction) {
                     bullet->loadBullet("Assets/animations/bullet_right.png", screen);
                     bullet->setHor(10);
@@ -399,6 +411,15 @@ public:
         return y_pos;
     }
     int get_height_frame() const { return height_frame; }
+
+    SDL_Rect getRect() const {
+        SDL_Rect r;
+        r.x = static_cast<int>(x_pos);
+        r.y = static_cast<int>(y_pos);
+        r.w = width_frame;
+        r.h = height_frame;
+        return r;
+    }
 
 
 private:

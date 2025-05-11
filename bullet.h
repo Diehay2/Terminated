@@ -2,11 +2,19 @@
 #define BULLET_H
 
 #include "SDL_utils.h"
+enum Tag {
+    PLAYER = 0,
+    ENEMY = 1
+};
 
 class Bullet {
 public:
     Bullet() : texture(nullptr) {}
     ~Bullet() {}
+
+    void setTag(int _tag) {
+        tag = _tag;
+    }
 
     void fire() {
         if (is_moving) {
@@ -71,6 +79,8 @@ public:
         return rect;
     }
 
+    int getTag() const { return tag; }
+
 private:
     float x_val = 0;
     float y_val = 0;
@@ -89,6 +99,8 @@ private:
 
     int max_range = 100;
     int distance = 0;
+
+    int tag = PLAYER;
 };
 
 #endif // BULLET_H

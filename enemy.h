@@ -100,10 +100,20 @@ public:
             bullet->fire();
             bullet->updateFrame();
             bullet->render(des);
+
+            bool _delete = false;
+
             if (bullet->OutRange() || check_to_bullet(bullet, map_data)) {
-            delete bullet;
-            bullet_list.erase(bullet_list.begin() + i);
-            i--;
+                _delete = true;
+                }
+            else if (bullet->getTag() == PLAYER && check_interaction(this->getRect(), bullet->getRect())) {
+                _delete = true;
+                }
+
+            if (_delete) {
+                delete bullet;
+                bullet_list.erase(bullet_list.begin() + i);
+                i--;
                 }
             }
         }
@@ -189,43 +199,70 @@ public:
         float check_distance = x_pos - player_x_pos;
         direction = (check_distance < 0);
 
-        float enemy_center_y = y_pos + height_frame / 2.0f;
-float player_center_y = player_y_pos + p_player.get_height_frame() / 2.0f;
-
-if (fabs(enemy_center_y - player_center_y) <= 40 && fabs(check_distance) <= distance)
- {
+        if (fabs(y_pos - player_y_pos) <=10 && fabs(check_distance) <= distance) {
             status = direction ? PISTOL_RIGHT : PISTOL_LEFT;
             return true;
                 }
                 return false;
         }
 
+    bool is_seen(Player& p_player, Map& map_data) {
+        float player_x_pos = p_player.get_x_pos();
+        float player_y_pos = p_player.get_y_pos();
+
+        float check_distance = x_pos - player_x_pos;
+
+        int start_x = min((int)(x_pos / TILE_SIZE), (int)(player_x_pos / TILE_SIZE));
+        int end_x = max((int)(x_pos / TILE_SIZE), (int)(player_x_pos / TILE_SIZE));
+
+        if (fabs(y_pos - player_y_pos) <= 10 && fabs(check_distance) <= distance) {
+            for (int i = start_x; i <= end_x; i++) {
+                if (map_data.tile[(int)(player_y_pos / TILE_SIZE)][i] != 0) {
+                    return false;
+                }
+            }
+            return true;
+        }
+        return false;
+}
+
+
     void DoEnemy (SDL_Renderer* screen, Map& map_data) {
             bool near = inDistance(*p_player, screen);
-            if (near) {
-                    Uint32 now = SDL_GetTicks();
+            bool seen = is_seen(*p_player, map_data);
+            Uint32 now = SDL_GetTicks();
+            if (near && seen) {
+
+                if (!detect) {
+                detect = true;
+                detection = now;
+            }
+            if (now - detection >= delay_first) {
+            if (now - shot >= delay_shooting) {
                 if (!is_shooting && now - shot >= cooldown) {
                     Bullet* bullet = new Bullet();
                     shot = now;
                     is_shooting = false;
+                    bullet->setTag(ENEMY);
                 if (direction) {
                     bullet->loadBullet("Assets/animations/bullet_right.png", screen);
-                    bullet->setHor(10);
+                    bullet->setHor(5);
                     bullet->setPos(x_pos + 5, y_pos + 2);
                 }
                 else {
                     bullet->loadBullet("Assets/animations/bullet_left.png",screen);
-                    bullet->setHor(-10);
+                    bullet->setHor(-5);
                     bullet->setPos(x_pos - 45, y_pos + 2);
                 }
                 bullet_list.push_back(bullet);
+                    }
                 }
             }
+            }
             else {
-        // Không gần thì set về trạng thái đứng nếu chưa đúng
-        if (direction) status = STANDING_RIGHT;
-        else status = STANDING_LEFT;
-    }
+                detect = false;
+                status = direction ? STANDING_RIGHT : STANDING_LEFT;
+            }
             y_val += GRAVITY_SPEED;
             if (y_val >= MAX_FALL_SPEED) {
                 y_val = MAX_FALL_SPEED;
@@ -237,6 +274,14 @@ if (fabs(enemy_center_y - player_center_y) <= 40 && fabs(check_distance) <= dist
             return;
         }
 
+    SDL_Rect getRect() const {
+        SDL_Rect r;
+        r.x = static_cast<int>(x_pos);
+        r.y = static_cast<int>(y_pos);
+        r.w = width_frame;
+        r.h = height_frame;
+        return r;
+    }
 
 private:
     float x_val = 0;
@@ -292,9 +337,14 @@ private:
     bool direction = false; // true = right / false = left
 
     Uint32 shot = 0;
-    Uint32 cooldown = 500;
+    Uint32 cooldown = 800;
 
-    float distance = 100;
+    Uint32 detection = 0;
+    Uint32 delay_shooting = 2000;
+    Uint32 delay_first = 500;
+    bool detect = false;
+
+    float distance = 120;
 
     vector<Bullet*> bullet_list;
 };
