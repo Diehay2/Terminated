@@ -2,10 +2,13 @@
 #include "map.h"
 #include "player.h"
 #include "enemy.h"
+#include "bullet.h"
 
 SDL_Window* window = nullptr;
 SDL_Renderer* renderer = nullptr;
 SDL_Event event;
+vector<Bullet*> enemy_bullet_list;
+vector<Bullet*> player_bullet_list;
 
 using namespace std;
 
@@ -27,10 +30,10 @@ int main(int argc, char* argv[]) {
     p_player.setclip_jumping();
     p_player.setclip_pistol();
 
-const int EnemyNum = 30;
-vector<Enemy> enemy_list;
 
-for (int i = 0; i < EnemyNum; ++i) {
+    const int EnemyNum = 30;
+    vector<Enemy> enemy_list;
+    for (int i = 0; i < EnemyNum; ++i) {
     Enemy enemy;
     enemy.p_player = &p_player;
     if (i < 5) {
@@ -65,9 +68,11 @@ for (int i = 0; i < EnemyNum; ++i) {
         }
 
         p_player.DoPlayer(tileMap.getMap());
+        p_player.checkHit(enemy_bullet_list);
 
         for (Enemy& enemy : enemy_list) {
             enemy.DoEnemy(renderer, tileMap.getMap());
+            enemy.checkHit(player_bullet_list);
         }
 
         SDL_RenderClear(renderer);

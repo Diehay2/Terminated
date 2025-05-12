@@ -2,25 +2,23 @@
 #define BULLET_H
 
 #include "SDL_utils.h"
-enum Tag {
-    PLAYER = 0,
-    ENEMY = 1
-};
+
+class Bullet;
+
+extern vector<Bullet*> enemy_bullet_list;
+extern vector<Bullet*> player_bullet_list;
 
 class Bullet {
 public:
     Bullet() : texture(nullptr) {}
     ~Bullet() {}
 
-    void setTag(int _tag) {
-        tag = _tag;
-    }
-
     void fire() {
         if (is_moving) {
             rect.x += static_cast<int>(x_val);
             rect.y += static_cast<int>(y_val);
             distance += static_cast<int>(abs(x_val));
+            cout << "bullet x: " << rect.x << " frame: " << current_frame << std::endl;
         }
     }
 
@@ -79,8 +77,6 @@ public:
         return rect;
     }
 
-    int getTag() const { return tag; }
-
 private:
     float x_val = 0;
     float y_val = 0;
@@ -99,8 +95,6 @@ private:
 
     int max_range = 100;
     int distance = 0;
-
-    int tag = PLAYER;
 };
 
 #endif // BULLET_H

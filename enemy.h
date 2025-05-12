@@ -4,6 +4,7 @@
 #include "SDL_utils.h"
 #include "map.h"
 #include "player.h"
+#include "bullet.h"
 
 class Enemy {
 public:
@@ -94,29 +95,20 @@ public:
     SDL_Rect renderQuad = {static_cast<int>(x_pos), static_cast<int>(y_pos + 1), width_frame, height_frame};
     SDL_RenderCopy(des, current_texture, current_clip, &renderQuad);
 
-    for (int i = 0; i < bullet_list.size(); ++i) {
-        Bullet* bullet = bullet_list[i];
-        if (bullet != nullptr) {
-            bullet->fire();
-            bullet->updateFrame();
-            bullet->render(des);
-
-            bool _delete = false;
-
-            if (bullet->OutRange() || check_to_bullet(bullet, map_data)) {
-                _delete = true;
-                }
-            else if (bullet->getTag() == PLAYER && check_interaction(this->getRect(), bullet->getRect())) {
-                _delete = true;
-                }
-
-            if (_delete) {
-                delete bullet;
-                bullet_list.erase(bullet_list.begin() + i);
-                i--;
-                }
-            }
+    for (int i = 0; i < enemy_bullet_list.size(); ++i) {
+    Bullet* bullet = enemy_bullet_list[i];
+    if (bullet != nullptr) {
+        bullet->fire();
+        bullet->updateFrame();
+        bullet->render(des);
+        if (bullet->OutRange() || check_to_bullet(bullet, map_data)) {
+            delete bullet;
+            enemy_bullet_list.erase(enemy_bullet_list.begin() + i);
+            i--;
         }
+    }
+}
+
     }
 
     bool check_to_bullet(Bullet* bullet, Map& map_data) {
@@ -192,6 +184,7 @@ public:
         x_pos = map_data.max_x - width_frame - 1;
     }
 }
+
     bool inDistance (Player& p_player, SDL_Renderer* screen) {
         float player_x_pos = p_player.get_x_pos();
         float player_y_pos = p_player.get_y_pos();
@@ -242,19 +235,17 @@ public:
                 if (!is_shooting && now - shot >= cooldown) {
                     Bullet* bullet = new Bullet();
                     shot = now;
-                    is_shooting = false;
-                    bullet->setTag(ENEMY);
                 if (direction) {
                     bullet->loadBullet("Assets/animations/bullet_right.png", screen);
-                    bullet->setHor(5);
+                    bullet->setHor(10);
                     bullet->setPos(x_pos + 5, y_pos + 2);
                 }
                 else {
                     bullet->loadBullet("Assets/animations/bullet_left.png",screen);
-                    bullet->setHor(-5);
+                    bullet->setHor(-10);
                     bullet->setPos(x_pos - 45, y_pos + 2);
                 }
-                bullet_list.push_back(bullet);
+                enemy_bullet_list.push_back(bullet);
                     }
                 }
             }
@@ -282,6 +273,17 @@ public:
         r.h = height_frame;
         return r;
     }
+
+    void checkHit(vector<Bullet*>& bullets) {
+    for (int i = 0; i < bullets.size(); ++i) {
+        if (check_interaction(this->getRect(), bullets[i]->getRect())) {
+            delete bullets[i];
+            bullets.erase(bullets.begin() + i);
+            --i;
+            cout << "Enemy hit!" << endl;
+        }
+    }
+}
 
 private:
     float x_val = 0;
@@ -345,8 +347,6 @@ private:
     bool detect = false;
 
     float distance = 120;
-
-    vector<Bullet*> bullet_list;
 };
 
 #endif // ENEMY_H

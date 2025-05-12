@@ -186,30 +186,20 @@ public:
     SDL_Rect renderQuad = {static_cast<int>(x_pos), static_cast<int>(y_pos + 1), width_frame, height_frame};
     SDL_RenderCopy(des, current_texture, current_clip, &renderQuad);
 
-    for (int i = 0; i < bullet_list.size(); ++i) {
-        Bullet* bullet = bullet_list[i];
+    for (int i = 0; i < player_bullet_list.size(); ++i) {
+        Bullet* bullet = player_bullet_list[i];
         if (bullet != nullptr) {
             bullet->fire();
             bullet->updateFrame();
             bullet->render(des);
-            cout << "Bullet size: " << rect.w << "x" << rect.h << std::endl;
-
-            bool _delete = false;
 
             if (bullet->OutRange() || check_to_bullet(bullet, map_data)) {
-                _delete = true;
-                }
-            else if (bullet->getTag() == ENEMY && check_interaction(this->getRect(), bullet->getRect())) {
-                _delete = true;
-                }
-
-            if (_delete) {
                 delete bullet;
-                bullet_list.erase(bullet_list.begin() + i);
+                player_bullet_list.erase(player_bullet_list.begin() + i);
                 i--;
-                }
             }
         }
+    }
     }
 
     void handleInput(SDL_Event input, SDL_Renderer* screen) {
@@ -246,7 +236,6 @@ public:
                 if (is_shooting && now - shot >= cooldown) {
                     Bullet* bullet = new Bullet();
                     shot = now;
-                    bullet->setTag(PLAYER);
                 if (direction) {
                     bullet->loadBullet("Assets/animations/bullet_right.png", screen);
                     bullet->setHor(10);
@@ -257,7 +246,7 @@ public:
                     bullet->setHor(-10);
                     bullet->setPos(x_pos - 45, y_pos + 2);
                 }
-                bullet_list.push_back(bullet);
+                player_bullet_list.push_back(bullet);
                 }
                 }
                 break;
@@ -407,19 +396,32 @@ public:
     float get_x_pos() {
         return x_pos;
     }
+
     float get_y_pos() {
         return y_pos;
     }
+
     int get_height_frame() const { return height_frame; }
 
     SDL_Rect getRect() const {
         SDL_Rect r;
         r.x = static_cast<int>(x_pos);
-        r.y = static_cast<int>(y_pos);
+        r.y = static_cast<int>(y_pos + 1);
         r.w = width_frame;
         r.h = height_frame;
         return r;
     }
+
+    void checkHit(vector<Bullet*>& enemy_bullets) {
+    for (int i = 0; i < enemy_bullets.size(); ++i) {
+        if (check_interaction(this->getRect(), enemy_bullets[i]->getRect())) {
+            cout << "Player hit\n";
+            delete enemy_bullets[i];
+            enemy_bullets.erase(enemy_bullets.begin() + i);
+            i--;
+        }
+    }
+}
 
 
 private:
@@ -477,8 +479,6 @@ private:
 
     Uint32 shot = 0;
     Uint32 cooldown = 500;
-
-    vector<Bullet*> bullet_list;
 };
 
 #endif // PLAYER_H
