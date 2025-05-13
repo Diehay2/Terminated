@@ -5,7 +5,6 @@
 
 class Bullet;
 
-extern vector<Bullet*> enemy_bullet_list;
 extern vector<Bullet*> player_bullet_list;
 
 class Bullet {
@@ -18,7 +17,6 @@ public:
             rect.x += static_cast<int>(x_val);
             rect.y += static_cast<int>(y_val);
             distance += static_cast<int>(abs(x_val));
-            cout << "bullet x: " << rect.x << " frame: " << current_frame << std::endl;
         }
     }
 
@@ -62,7 +60,7 @@ public:
     }
 
     bool OutRange() {
-        return rect.x < 0 || rect.x > SCREEN_WIDTH || distance >= max_range;
+        return rect.x <= -100|| rect.x >= SCREEN_WIDTH + 100|| distance >= max_range;
     }
 
     void updateFrame() {
@@ -93,7 +91,7 @@ private:
     int bullet_width_frame = 0;
     int bullet_height_frame = 0;
 
-    int max_range = 100;
+    int max_range = 200;
     int distance = 0;
 };
 

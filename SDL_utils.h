@@ -81,7 +81,7 @@ void quit() {
 }
 
 bool check_interaction(const SDL_Rect& a, const SDL_Rect& b) {
-    return !(a.x + a.w <= b.x || a.x >= b.x + b.w ||
+    return !(a.x + a.w - 15 <= b.x || a.x + 15 >= b.x + b.w ||
              a.y + a.h <= b.y || a.y >= b.y + b.h);
 }
 #endif // DSL_UTILS_H
