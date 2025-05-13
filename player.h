@@ -517,6 +517,18 @@ public:
     void setWeapon() {
         holding_rifle = true;
     }
+    void renderHealthBar(SDL_Renderer* renderer) {
+    if (health <= 0) return;
+    SDL_Rect bg = {(int) x_pos + width_frame/2 - 15, (int)y_pos - 1, 30, 2};
+    SDL_Rect fg = {(int) x_pos + width_frame/2 - 15, (int)y_pos - 1, (int)(30 * (health / (float)max_health)), 2};
+
+    SDL_SetRenderDrawColor(renderer, 100, 0, 0, 255);
+    SDL_RenderFillRect(renderer, &bg);
+
+    SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
+    SDL_RenderFillRect(renderer, &fg);
+}
+
 
 private:
     float x_val = 0;
@@ -595,7 +607,8 @@ private:
     Uint32 shot = 0;
     Uint32 cooldown = 0;
 
-    int health = 100;
+    int health = 20;
+    int max_health = 20;
 
     bool isDamaged = false;
     bool isDead = false;

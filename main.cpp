@@ -49,22 +49,25 @@ int main(int argc, char* argv[]) {
     Enemy enemy;
     enemy.p_player = &p_player;
     if (i < 5) {
-        enemy.setPos(20 + i * 250, 0 + i * 2);
+        enemy.setPos(0 + i * 250, 0 + i * 2);
     }
     else if (i < 10) {
-        enemy.setPos(200 + (i - 5) * 250, 280 + i * 3);
+        enemy.setPos(118 + (i - 5) * 250, 280 + i * 3);
     }
     else if (i < 15) {
-        enemy.setPos(150 + i * 200, 140 + i);
+        enemy.setPos(150 + (i - 10) * 210, 140 + i);
     }
     else if (i < 20) {
         enemy.setPos(200 + (i - 15) * 121, 224 + i * 2);
     }
     else if (i < 25) {
-        enemy.setPos(0 + (i - 20) * 100 * 4.5, 540 - i * 7.6);
+        enemy.setPos(0 + (i - 20) * 283, 540 - i * 7.6);
+    }
+    else if (i < 28) {
+        enemy.setPos(500 + (i - 25) * 350, 500 + (i - 20) * 2);
     }
     else {
-        enemy.setPos(500 + (i - 25) * 400, 224);
+        enemy.setPos(411 + (i - 27) * 250, 500 + (i - 20) * 2);
     }
 
     if (i % 2 == 0) {
@@ -90,18 +93,15 @@ int main(int argc, char* argv[]) {
 
         p_player.DoPlayer(tileMap.getMap());
         int player_tile_x = static_cast<int>(p_player.get_x_pos()) / TILE_SIZE;
-    int player_tile_y = static_cast<int>(p_player.get_y_pos()) / TILE_SIZE;
+        int player_tile_y = static_cast<int>(p_player.get_y_pos()) / TILE_SIZE;
 
-    int weapon_tile_x = static_cast<int>(rifle.get_x_pos()) / TILE_SIZE;
-    int weapon_tile_y = static_cast<int>(rifle.get_y_pos()) / TILE_SIZE;
-
-    if (player_tile_x == weapon_tile_x && player_tile_y == weapon_tile_y) {
-    p_player.setWeapon();
-    rifle.free();
-    mark.free();
-    }
-
-
+        int weapon_tile_x = static_cast<int>(rifle.get_x_pos()) / TILE_SIZE;
+        int weapon_tile_y = static_cast<int>(rifle.get_y_pos()) / TILE_SIZE;
+        if (player_tile_x == weapon_tile_x && player_tile_y == weapon_tile_y) {
+            p_player.setWeapon();
+            rifle.free();
+            mark.free();
+            }
 
         for (Enemy& enemy : enemy_list) {
                 p_player.checkHit(enemy.getBulletlist());
@@ -118,8 +118,9 @@ int main(int argc, char* argv[]) {
 
         for (Enemy& enemy : enemy_list) {
             enemy.ShowObject(renderer, tileMap.getMap());
+            enemy.renderHealthBar(renderer);
         }
-
+        p_player.renderHealthBar(renderer);
         SDL_RenderPresent(renderer);
         SDL_Delay(16);
     }
