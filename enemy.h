@@ -386,7 +386,7 @@ public:
             bullets.erase(bullets.begin() + i);
             i--;
             cout << "Enemy hit!" << endl;
-            health--;
+            health-=damage;
             isDamaged = true;
             status = direction ? DAMAGED_RIGHT : DAMAGED_LEFT;
             damaged_delay = 60;
@@ -416,6 +416,20 @@ public:
 
     SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
     SDL_RenderFillRect(renderer, &fg);
+    }
+
+    void get_player_weapon(int type) {
+        switch (type) {
+    case PISTOL:
+        damage = 1;
+        break;
+    case RIFLE:
+        damage = 0.5;
+        break;
+    case BAZOKA:
+        damage = 3;
+        break;
+        }
     }
 
 private:
@@ -483,15 +497,16 @@ private:
 
     Uint32 detection = 0;
     Uint32 delay_shooting = 1000;
-    Uint32 delay_first = 500;
+    Uint32 delay_first = 300;
     bool detect = false;
 
     float distance = 150;
 
     vector<Bullet*> bullet_list;
 
-    int health = 3;
-    int max_health = 3;
+    float health = 3;
+    float max_health = 3;
+    float damage = 0;
 
     bool isDamaged = false;
     bool isDead = false;

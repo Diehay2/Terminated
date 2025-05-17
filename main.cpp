@@ -4,10 +4,13 @@
 #include "enemy.h"
 #include "bullet.h"
 #include "object.h"
+#include "menu.h"
 
 SDL_Window* window = nullptr;
 SDL_Renderer* renderer = nullptr;
 SDL_Event event;
+TTF_Font* font_button = nullptr;
+TTF_Font* font_title = nullptr;
 
 vector<Bullet*> player_bullet_list;
 
@@ -17,6 +20,8 @@ int main(int argc, char* argv[]) {
     bool running = true;
     if (!Init())
         return 1;
+    Menu menu(window, renderer);
+    menu.run();
 
     SDL_Texture* background = loadImg("Assets/background1.PNG", renderer);
 
@@ -31,17 +36,18 @@ int main(int argc, char* argv[]) {
     p_player.setclip_jumping();
     p_player.setclip_pistol();
     p_player.setclip_rifle();
+    p_player.setclip_bazoka();
     p_player.setclip_damaged();
     p_player.setclip_dead();
+    p_player.setWeapon(0);
 
     Object rifle;
     rifle.setPos(850, 470);
-
-    Object mark;
-    mark.setPos(853, 450);
-
     rifle.loadObject("Assets/Rifle1.png", renderer);
-    mark.loadObject("Assets/9 Other/3 Skill icons/Skillicon7_10_1.png", renderer);
+
+    Object bazoka;
+    bazoka.setPos(530, 215);
+    bazoka.loadObject("Assets/bazoka.png", renderer);
 
     const int EnemyNum = 30;
     vector<Enemy> enemy_list;
@@ -74,6 +80,7 @@ int main(int argc, char* argv[]) {
         enemy.setWeapon();
     }
 
+    enemy.get_player_weapon(PISTOL);
     enemy.load_enemy(renderer);
     enemy.setclip_standing();
     enemy.setclip_pistol();
@@ -95,13 +102,27 @@ int main(int argc, char* argv[]) {
         int player_tile_x = static_cast<int>(p_player.get_x_pos()) / TILE_SIZE;
         int player_tile_y = static_cast<int>(p_player.get_y_pos()) / TILE_SIZE;
 
-        int weapon_tile_x = static_cast<int>(rifle.get_x_pos()) / TILE_SIZE;
-        int weapon_tile_y = static_cast<int>(rifle.get_y_pos()) / TILE_SIZE;
-        if (player_tile_x == weapon_tile_x && player_tile_y == weapon_tile_y) {
-            p_player.setWeapon();
-            rifle.free();
-            mark.free();
+        int rifle_tile_x = static_cast<int>(rifle.get_x_pos()) / TILE_SIZE;
+        int rifle_tile_y = static_cast<int>(rifle.get_y_pos()) / TILE_SIZE;
+
+        int bazoka_tile_x = static_cast<int>(bazoka.get_x_pos()) / TILE_SIZE;
+        int bazoka_tile_y = static_cast<int>(bazoka.get_y_pos()) / TILE_SIZE;
+
+        if (player_tile_x == rifle_tile_x && player_tile_y == rifle_tile_y) {
+            p_player.setWeapon(RIFLE);
+            for (Enemy& enemy : enemy_list) {
+                enemy.get_player_weapon(RIFLE);
             }
+            rifle.free();
+        }
+
+        if (player_tile_x == bazoka_tile_x && player_tile_y == bazoka_tile_y) {
+            p_player.setWeapon(BAZOKA);
+            for (Enemy& enemy : enemy_list) {
+                enemy.get_player_weapon(BAZOKA);
+            }
+            bazoka.free();
+        }
 
         for (Enemy& enemy : enemy_list) {
                 p_player.checkHit(enemy.getBulletlist());
@@ -114,7 +135,7 @@ int main(int argc, char* argv[]) {
         tileMap.DrawMap(renderer);
         p_player.ShowObject(renderer, tileMap.getMap());
         rifle.render(renderer);
-        mark.render(renderer);
+        bazoka.render(renderer);
 
         for (Enemy& enemy : enemy_list) {
             enemy.ShowObject(renderer, tileMap.getMap());
@@ -126,7 +147,7 @@ int main(int argc, char* argv[]) {
     }
 
     quit();
+
     return 0;
 }
-//37 23 1
 

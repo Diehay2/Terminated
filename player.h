@@ -32,7 +32,15 @@ enum Actions {
     DAMAGED_LEFT = 10,
     DAMAGED_RIGHT = 11,
     DEAD_LEFT = 12,
-    DEAD_RIGHT = 13
+    DEAD_RIGHT = 13,
+    BAZOKA_LEFT = 14,
+    BAZOKA_RIGHT = 15
+};
+
+enum WEAPONS {
+    PISTOL = 0,
+    RIFLE = 1,
+    BAZOKA = 2
 };
 
 class Player {
@@ -63,6 +71,9 @@ public:
     texture_rifle_left = loadImg("Assets/animations/rifle_left.png", screen);
     texture_rifle_right = loadImg("Assets/animations/rifle_right.png", screen);
 
+    texture_bazoka_left = loadImg("Assets/animations/bazoka_left.png", screen);
+    texture_bazoka_right = loadImg("Assets/animations/bazoka_right.png", screen);
+
     texture_damaged_left = loadImg("Assets/animations/damaged_left.png", screen);
     texture_damaged_right = loadImg("Assets/animations/damaged_right.png",screen);
 
@@ -75,7 +86,8 @@ public:
         || texture_pistol_left == nullptr || texture_pistol_right == nullptr
         || texture_damaged_left == nullptr || texture_damaged_right == nullptr
         || texture_dead_left == nullptr || texture_dead_right == nullptr
-        || texture_rifle_left == nullptr || texture_rifle_right == nullptr) {
+        || texture_rifle_left == nullptr || texture_rifle_right == nullptr
+        || texture_bazoka_left == nullptr || texture_bazoka_right == nullptr) {
         logError_Exit("Load Player", SDL_GetError());
         return false;
     }
@@ -99,6 +111,10 @@ public:
     SDL_QueryTexture(texture_rifle_right, nullptr, nullptr, &rect.w, &rect.h);
     rifle_width_frame = rect.w;
     rifle_height_frame = rect.h;
+
+    SDL_QueryTexture(texture_bazoka_right, nullptr, nullptr, &rect.w, &rect.h);
+    bazoka_width_frame = rect.w;
+    bazoka_height_frame = rect.h;
 
     SDL_QueryTexture(texture_damaged_right, nullptr, nullptr, &rect.w, &rect.h);
     damaged_width_frame = rect.w;
@@ -159,6 +175,15 @@ public:
         frame_clip_rifle[0].y = 0;
         frame_clip_rifle[0].w = rifle_width_frame;
         frame_clip_rifle[0].h = rifle_height_frame;
+        }
+    }
+
+    void setclip_bazoka() {
+    if (bazoka_width_frame > 0 && bazoka_height_frame > 0) {
+        frame_clip_bazoka[0].x = 0;
+        frame_clip_bazoka[0].y = 0;
+        frame_clip_bazoka[0].w = bazoka_width_frame;
+        frame_clip_bazoka[0].h = bazoka_height_frame;
         }
     }
 
@@ -235,6 +260,16 @@ public:
                     ? texture_rifle_left : texture_rifle_right;
     width_frame = rifle_width_frame;
     height_frame = rifle_height_frame;
+    }
+
+    else if (status == BAZOKA_LEFT || status == BAZOKA_RIGHT) {
+    frame = 0;
+    is_shooting = false;
+    current_clip = &frame_clip_rifle[frame];
+    current_texture = (status == BAZOKA_LEFT || status == STANDING_LEFT)
+                    ? texture_bazoka_left : texture_bazoka_right;
+    width_frame = bazoka_width_frame;
+    height_frame = bazoka_height_frame;
     }
 
     else if (status == DAMAGED_LEFT || status == DAMAGED_RIGHT) {
@@ -315,9 +350,20 @@ public:
             case SDLK_c:
                 if (on_ground && !is_shooting) {
                 is_shooting = true;
-                if (!holding_rifle) status = direction ? PISTOL_RIGHT : PISTOL_LEFT;
-                else status = direction ? RIFLE_RIGHT : RIFLE_LEFT;
-                cooldown = holding_rifle ? 300 : 500;
+                switch (weapon) {
+                case RIFLE:
+                    status = direction ? RIFLE_RIGHT : RIFLE_LEFT;
+                    cooldown = 300;
+                    break;
+                case BAZOKA:
+                    status = direction ? BAZOKA_RIGHT : BAZOKA_LEFT;
+                    cooldown = 800;
+                    break;
+                case PISTOL:
+                    status = direction ? PISTOL_RIGHT : PISTOL_LEFT;
+                    cooldown = 600;
+                    break;
+                }
                 frame = 0;
                 input_type.left = 0;
                 input_type.right = 0;
@@ -514,8 +560,8 @@ public:
         }
     }
 }
-    void setWeapon() {
-        holding_rifle = true;
+    void setWeapon(int type) {
+        weapon = type;
     }
     void renderHealthBar(SDL_Renderer* renderer) {
     if (health <= 0) return;
@@ -555,6 +601,9 @@ private:
     int rifle_width_frame = 0;
     int rifle_height_frame = 0;
 
+    int bazoka_width_frame = 0;
+    int bazoka_height_frame = 0;
+
     int damaged_width_frame = 0;
     int damaged_height_frame = 0;
 
@@ -566,6 +615,7 @@ private:
     SDL_Rect frame_clip_walking[4];
     SDL_Rect frame_clip_pistol[1];
     SDL_Rect frame_clip_rifle[1];
+    SDL_Rect frame_clip_bazoka[1];
     SDL_Rect frame_clip_damaged[1];
     SDL_Rect frame_clip_dead[1];
 
@@ -591,6 +641,9 @@ private:
     SDL_Texture* texture_rifle_left = nullptr;
     SDL_Texture* texture_rifle_right = nullptr;
 
+    SDL_Texture* texture_bazoka_left = nullptr;
+    SDL_Texture* texture_bazoka_right = nullptr;
+
     SDL_Texture* texture_damaged_left = nullptr;
     SDL_Texture* texture_damaged_right = nullptr;
 
@@ -607,13 +660,14 @@ private:
     Uint32 shot = 0;
     Uint32 cooldown = 0;
 
-    int health = 20;
-    int max_health = 20;
+    float health = 20;
+    float max_health = 20;
 
     bool isDamaged = false;
     bool isDead = false;
 
     bool holding_rifle = false;
+    int weapon;
 };
 
 #endif // PLAYER_H
