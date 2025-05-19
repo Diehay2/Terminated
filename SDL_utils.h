@@ -24,7 +24,7 @@ extern TTF_Font* font_title;
 
 const int SCREEN_WIDTH = 1280;
 const int SCREEN_HEIGHT = 640;
-const char* const TITLE = "Nobodies";
+const char* const TITLE = "TERMINATED";
 
 void logError_Exit (const char* msg, const char* error)
 {

@@ -431,6 +431,9 @@ public:
         break;
         }
     }
+    bool is_dead() const { return isDead; }
+    bool isCounted() const { return counted; }
+    void setCounted(bool value) { counted = value; }
 
 private:
     float x_val = 0;
@@ -510,6 +513,7 @@ private:
 
     bool isDamaged = false;
     bool isDead = false;
+    bool counted = false;
 
     bool holding_rifle = false;
 
