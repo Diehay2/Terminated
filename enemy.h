@@ -5,6 +5,7 @@
 #include "map.h"
 #include "player.h"
 #include "bullet.h"
+#include "audio.h"
 
 class Enemy {
 public:
@@ -20,24 +21,23 @@ public:
     void setPos(float x, float y) {
         x_pos = x;
         y_pos = y;
-
     }
 
     bool load_enemy(SDL_Renderer* screen) {
-    texture_standing_left = loadImg("Assets/animations/enemy_standing_left.png", screen);
-    texture_standing_right = loadImg("Assets/animations/enemy_standing_right.png", screen);
+    texture_standing_left = loadImg("Assets/Animations/enemy_standing_left.png", screen);
+    texture_standing_right = loadImg("Assets/Animations/enemy_standing_right.png", screen);
 
-    texture_pistol_left = loadImg("Assets/animations/enemy_pistol_left.png", screen);
-    texture_pistol_right = loadImg("Assets/animations/enemy_pistol_right.png", screen);
+    texture_pistol_left = loadImg("Assets/Animations/enemy_pistol_left.png", screen);
+    texture_pistol_right = loadImg("Assets/Animations/enemy_pistol_right.png", screen);
 
-    texture_rifle_left = loadImg("Assets/animations/enemy_rifle_left.png", screen);
-    texture_rifle_right = loadImg("Assets/animations/enemy_rifle_right.png", screen);
+    texture_rifle_left = loadImg("Assets/Animations/enemy_rifle_left.png", screen);
+    texture_rifle_right = loadImg("Assets/Animations/enemy_rifle_right.png", screen);
 
-    texture_damaged_left = loadImg("Assets/animations/enemy_damaged_left.png", screen);
-    texture_damaged_right = loadImg("Assets/animations/enemy_damaged_right.png",screen);
+    texture_damaged_left = loadImg("Assets/Animations/enemy_damaged_left.png", screen);
+    texture_damaged_right = loadImg("Assets/Animations/enemy_damaged_right.png",screen);
 
-    texture_dead_left = loadImg("Assets/animations/enemy_dead_left.png", screen);
-    texture_dead_right = loadImg("Assets/animations/enemy_dead_right.png", screen);
+    texture_dead_left = loadImg("Assets/Animations/enemy_dead_left.png", screen);
+    texture_dead_right = loadImg("Assets/Animations/enemy_dead_right.png", screen);
 
     if (texture_standing_left == nullptr || texture_standing_right == nullptr
         || texture_pistol_left == nullptr || texture_pistol_right == nullptr
@@ -321,13 +321,14 @@ public:
                 if (!is_shooting && now - shot >= cooldown) {
                     Bullet* bullet = new Bullet();
                     shot = now;
+                    sound.playShoot();
                 if (direction) {
-                    bullet->loadBullet("Assets/animations/bullet_right.png", screen);
+                    bullet->loadBullet("Assets/Animations/bullet_right.png", screen);
                     bullet->setHor(10);
                     bullet->setPos(x_pos + 5, y_pos + 2);
                 }
                 else {
-                    bullet->loadBullet("Assets/animations/bullet_left.png",screen);
+                    bullet->loadBullet("Assets/Animations/bullet_left.png",screen);
                     bullet->setHor(-10);
                     bullet->setPos(x_pos - 45, y_pos + 2);
                 }
@@ -390,10 +391,12 @@ public:
             isDamaged = true;
             status = direction ? DAMAGED_RIGHT : DAMAGED_LEFT;
             damaged_delay = 60;
+            sound.playHurt();
         }
         if (health <= 0) {
             status = direction ? DEAD_LEFT : DEAD_RIGHT;
             isDead = true;
+            sound.playDeath();
         }
         }
     }
@@ -424,7 +427,7 @@ public:
         damage = 1;
         break;
     case RIFLE:
-        damage = 0.5;
+        damage = 1;
         break;
     case BAZOKA:
         damage = 3;

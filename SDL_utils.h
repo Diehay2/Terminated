@@ -13,6 +13,7 @@
 #include <ctime>
 #include <SDL_ttf.h>
 #include <SDL_mixer.h>
+#include "audio.h"
 
 using namespace std;
 
@@ -21,6 +22,7 @@ extern SDL_Renderer* renderer;
 extern SDL_Event event;
 extern TTF_Font* font_button;
 extern TTF_Font* font_title;
+extern Audio sound;
 
 const int SCREEN_WIDTH = 1280;
 const int SCREEN_HEIGHT = 640;

@@ -6,7 +6,7 @@
 using namespace std;
 
 #define MAX_MAP_X 40
-#define MAX_MAP_Y 20
+#define MAX_MAP_Y 22
 #define TILE_SIZE 32
 #define MAX_TILES 6
 
@@ -65,7 +65,7 @@ file.close();
 void loadTiles(SDL_Renderer* screen) {
     for (int i = 0; i < MAX_TILES; i++) {
         if (i > 0) {
-        string filename = "Assets/tileset/main_tileset" + to_string(i-1) + ".png";
+        string filename = "Assets/Tileset/main_tileset" + to_string(i-1) + ".png";
 
         tile_mat[i] = loadImg(filename, screen);
 

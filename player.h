@@ -4,6 +4,7 @@
 #include "SDL_utils.h"
 #include "map.h"
 #include "bullet.h"
+#include "audio.h"
 
 using namespace std;
 
@@ -56,29 +57,29 @@ public:
     ~Player(){;}
 
     bool load_player(SDL_Renderer* screen) {
-    texture_standing_left = loadImg("Assets/animations/standing_left.png", screen);
-    texture_standing_right = loadImg("Assets/animations/standing_right.png", screen);
+    texture_standing_left = loadImg("Assets/Animations/standing_left.png", screen);
+    texture_standing_right = loadImg("Assets/Animations/standing_right.png", screen);
 
-    texture_walking_left = loadImg("Assets/animations/walking_left.png", screen);
-    texture_walking_right = loadImg("Assets/animations/walking_right.png", screen);
+    texture_walking_left = loadImg("Assets/Animations/walking_left.png", screen);
+    texture_walking_right = loadImg("Assets/Animations/walking_right.png", screen);
 
-    texture_jump_left = loadImg("Assets/animations/jumping_left.png", screen);
-    texture_jump_right = loadImg("Assets/animations/jumping_right.png", screen);
+    texture_jump_left = loadImg("Assets/Animations/jumping_left.png", screen);
+    texture_jump_right = loadImg("Assets/Animations/jumping_right.png", screen);
 
-    texture_pistol_left = loadImg("Assets/animations/pistol_left.png", screen);
-    texture_pistol_right = loadImg("Assets/animations/pistol_right.png", screen);
+    texture_pistol_left = loadImg("Assets/Animations/pistol_left.png", screen);
+    texture_pistol_right = loadImg("Assets/Animations/pistol_right.png", screen);
 
-    texture_rifle_left = loadImg("Assets/animations/rifle_left.png", screen);
-    texture_rifle_right = loadImg("Assets/animations/rifle_right.png", screen);
+    texture_rifle_left = loadImg("Assets/Animations/rifle_left.png", screen);
+    texture_rifle_right = loadImg("Assets/Animations/rifle_right.png", screen);
 
-    texture_bazoka_left = loadImg("Assets/animations/bazoka_left.png", screen);
-    texture_bazoka_right = loadImg("Assets/animations/bazoka_right.png", screen);
+    texture_bazoka_left = loadImg("Assets/Animations/bazoka_left.png", screen);
+    texture_bazoka_right = loadImg("Assets/Animations/bazoka_right.png", screen);
 
-    texture_damaged_left = loadImg("Assets/animations/damaged_left.png", screen);
-    texture_damaged_right = loadImg("Assets/animations/damaged_right.png",screen);
+    texture_damaged_left = loadImg("Assets/Animations/damaged_left.png", screen);
+    texture_damaged_right = loadImg("Assets/Animations/damaged_right.png",screen);
 
-    texture_dead_left = loadImg("Assets/animations/dead_left.png", screen);
-    texture_dead_right = loadImg("Assets/animations/dead_right.png", screen);
+    texture_dead_left = loadImg("Assets/Animations/dead_left.png", screen);
+    texture_dead_right = loadImg("Assets/Animations/dead_right.png", screen);
 
     if (texture_standing_left == nullptr || texture_standing_right == nullptr
         || texture_walking_left == nullptr || texture_walking_right == nullptr
@@ -371,13 +372,14 @@ public:
                 if (is_shooting && now - shot >= cooldown) {
                     Bullet* bullet = new Bullet();
                     shot = now;
+                    sound.playShoot();
                 if (direction) {
-                    bullet->loadBullet("Assets/animations/bullet_right.png", screen);
+                    bullet->loadBullet("Assets/Animations/bullet_right.png", screen);
                     bullet->setHor(10);
                     bullet->setPos(x_pos + 5, y_pos + 2);
                 }
                 else {
-                    bullet->loadBullet("Assets/animations/bullet_left.png",screen);
+                    bullet->loadBullet("Assets/Animations/bullet_left.png",screen);
                     bullet->setHor(-10);
                     bullet->setPos(x_pos - 45, y_pos + 2);
                 }
@@ -487,6 +489,12 @@ public:
     y1 = (y_pos + y_val) / TILE_SIZE;
     y2 = (y_pos + y_val + height_min - 1) / TILE_SIZE;
 
+    if (map_data.max_y > 0 && y2 >= MAX_MAP_Y) {
+        isDead = true;
+        sound.playLose();
+        return;
+    }
+
     if (y_val > 0) {
         if (map_data.tile[y2][x1] > 0 || map_data.tile[y2][x2] > 0) {
             y_pos = y2 * TILE_SIZE - height_frame;
@@ -553,16 +561,20 @@ public:
             health--;
             isDamaged = true;
             status = direction ? DAMAGED_RIGHT : DAMAGED_LEFT;
+            sound.playHurt();
         }
         if (health <= 0) {
             status = direction ? DEAD_LEFT : DEAD_RIGHT;
             isDead = true;
+            sound.playLose();
         }
     }
 }
     void setWeapon(int type) {
         weapon = type;
+
     }
+
     void renderHealthBar(SDL_Renderer* renderer) {
     if (health <= 0) return;
     SDL_Rect bg = {(int) x_pos + width_frame/2 - 15, (int)y_pos - 1, 30, 2};
@@ -573,8 +585,11 @@ public:
 
     SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
     SDL_RenderFillRect(renderer, &fg);
-}
+    }
 
+    bool const checkDead () {
+        return isDead;
+    }
 
 private:
     float x_val = 0;

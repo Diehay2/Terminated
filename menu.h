@@ -79,7 +79,6 @@ public:
     currentState = state;
 }
 
-
 private:
     SDL_Window* window;
     SDL_Renderer* renderer;
@@ -111,7 +110,7 @@ private:
         muteTexture = loadImg("Assets/Logo/Icon_37.png", renderer);
         resumeTexture = loadImg("Assets/Logo/menu_bar.png", renderer);
         logoTexture = loadImg("Assets/Logo/Logo1.png", renderer);
-        backgroundTexture = loadImg("Assets/background.png", renderer);
+        backgroundTexture = loadImg("Assets/Background/background.png", renderer);
         helpFrameTexture = loadImg("Assets/Logo/frame.png", renderer);
     }
 
@@ -128,6 +127,7 @@ private:
                     currentState = HELP_SCREEN_MENU;
                 } else if (inside(x, y, muteButton)) {
                     isMuted = !isMuted;
+                    sound.setMuted(isMuted);
                 }
             } else if (currentState == HELP_SCREEN_MENU) {
                 currentState = MAIN_MENU;
@@ -136,11 +136,16 @@ private:
             } else if (currentState == PAUSE_MENU) {
                 if (inside(x, y, resumeButton)) {
                     return false;
+                } else if (inside(x, y, muteButton)) {
+                    isMuted = !isMuted;
+                    sound.setMuted(isMuted);
                 }
                 else if (inside(x, y, helpButton_pause)) {
                     currentState = HELP_SCREEN_PAUSE;
                 }
             } else if (currentState == WIN) {
+                currentState = MAIN_MENU;
+            } else if (currentState == LOSE) {
                 currentState = MAIN_MENU;
             }
         }
@@ -163,21 +168,21 @@ private:
 
         } else if (currentState == HELP_SCREEN_MENU) {
             SDL_RenderCopy(renderer, helpFrameTexture, nullptr, &helpFrameRect);
-            renderText("Use arrow keys to move", SCREEN_WIDTH/2 - 200, 100, font_button);
-            renderText("Press C to shoot", SCREEN_WIDTH/2 - 200, 150, font_button);
-            renderText("Pick up weapons to upgrade", SCREEN_WIDTH/2 - 200, 200, font_button);
-            renderText("your gun", SCREEN_WIDTH/2 - 200, 250, font_button);
-            renderText("Kill all the enemies to win", SCREEN_WIDTH/2 - 200, 300, font_button);
-            renderText("the game", SCREEN_WIDTH/2 - 200, 350, font_button);
+            renderText("Use arrow keys to move", SCREEN_WIDTH/2 - 250, 100, font_button);
+            renderText("Press C to shoot", SCREEN_WIDTH/2 - 250, 150, font_button);
+            renderText("Pick up weapons to upgrade", SCREEN_WIDTH/2 - 250, 200, font_button);
+            renderText("your gun", SCREEN_WIDTH/2 - 250, 250, font_button);
+            renderText("Kill all the enemies to win", SCREEN_WIDTH/2 - 250, 300, font_button);
+            renderText("the game", SCREEN_WIDTH/2 - 250, 350, font_button);
             renderText("Click anywhere to return", SCREEN_WIDTH/2 - 200, 550, font_button);
         }else if (currentState == HELP_SCREEN_PAUSE) {
             SDL_RenderCopy(renderer, helpFrameTexture, nullptr, &helpFrameRect);
-            renderText("Use arrow keys to move", SCREEN_WIDTH/2 - 200, 100, font_button);
-            renderText("Press C to shoot", SCREEN_WIDTH/2 - 200, 150, font_button);
-            renderText("Pick up weapons to upgrade", SCREEN_WIDTH/2 - 200, 200, font_button);
-            renderText("your gun", SCREEN_WIDTH/2 - 200, 250, font_button);
-            renderText("Kill all the enemies to win", SCREEN_WIDTH/2 - 200, 300, font_button);
-            renderText("the game", SCREEN_WIDTH/2 - 200, 350, font_button);
+            renderText("Use arrow keys to move", SCREEN_WIDTH/2 - 250, 100, font_button);
+            renderText("Press C to shoot", SCREEN_WIDTH/2 - 250, 150, font_button);
+            renderText("Pick up weapons to upgrade", SCREEN_WIDTH/2 - 250, 200, font_button);
+            renderText("your gun", SCREEN_WIDTH/2 - 250, 250, font_button);
+            renderText("Kill all the enemies to win", SCREEN_WIDTH/2 - 250, 300, font_button);
+            renderText("the game", SCREEN_WIDTH/2 - 250, 350, font_button);
             renderText("Click anywhere to return", SCREEN_WIDTH/2 - 200, 550, font_button);
         } else if (currentState == PAUSE_MENU) {
             SDL_RenderCopy(renderer, resumeTexture, nullptr, &resumeButton);
@@ -196,6 +201,17 @@ private:
             renderText("no purpose, you then decided to", SCREEN_WIDTH/2 - 250, 340, font_button);
             renderText("call it a day and lived a", SCREEN_WIDTH/2 - 250, 370, font_button);
             renderText("peaceful life", SCREEN_WIDTH/2 - 250, 400, font_button);
+            renderText("Click anywhere to return", SCREEN_WIDTH/2 - 200, 550, font_button);
+        } else if (currentState == LOSE) {
+            SDL_RenderCopy(renderer, helpFrameTexture, nullptr, &helpFrameRect);
+            renderText("LOSE", SCREEN_WIDTH/2 - 100, 80, font_title);
+            renderText("As you failed to clear out the" , SCREEN_WIDTH/2 - 250, 190, font_button);
+            renderText("whole organisation, you laid", SCREEN_WIDTH/2 - 250, 220, font_button);
+            renderText("there hopelessly. Wishing", SCREEN_WIDTH/2 - 250, 250, font_button);
+            renderText("things were different, your", SCREEN_WIDTH/2 - 250, 280, font_button);
+            renderText("breath got weaker and weaker", SCREEN_WIDTH/2 - 250, 310, font_button);
+            renderText("until there was nothing but", SCREEN_WIDTH/2 - 250, 340, font_button);
+            renderText("chill in the air.", SCREEN_WIDTH/2 - 250, 370, font_button);
             renderText("Click anywhere to return", SCREEN_WIDTH/2 - 200, 550, font_button);
         }
 
